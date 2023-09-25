@@ -92,7 +92,7 @@ public class CriarUsuario {
     }
 
     public CriarUsuario() {
-        String nome, senha = "", salt;
+        String nome, senha = "";
 
         nome = criarNomeDeUsuario();
         if (!nome.equals(UtilsComunsInput.CANCELAR_OPERACAO)) senha = criarSenha();
