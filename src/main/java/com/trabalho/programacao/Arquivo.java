@@ -1,51 +1,69 @@
 package com.trabalho.programacao;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Arquivo {
-
     private static final String CAMINHO_ARQUIVO = "src/main/resources/users.csv";
+    private static final File arquivoCSV = new File(CAMINHO_ARQUIVO);
+    private static final Logger logger = Logger.getLogger(Arquivo.class.getName());
 
-    private static void criarArquivoCSV()  {
-        File arquivo = new File(CAMINHO_ARQUIVO);
+    protected static void criarArquivoCSV() {
+        if (arquivoCSV.exists()) return;
 
-        try {
-            var resultado = arquivo.createNewFile();
-            System.out.println("Arquivo criado: " + resultado);
-        } catch (IOException e) { e.printStackTrace(); }
+        try (FileWriter fileWriter = new FileWriter(CAMINHO_ARQUIVO, false)) {
+            System.out.println((arquivoCSV.createNewFile()));
+            fileWriter.write("nome;senha;salt;highscore;modo de jogo (hscore);quantidade de jogos;\n");
+        } catch (IOException e) {
+            logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
+        }
     }
 
-    public static void adicionarAoArquivo(HashMap<String, String> usuario) {
-        File arquivo = new File(CAMINHO_ARQUIVO);
+    protected static void adicionarUsuarioAoArquivo(HashMap<String, String> usuario) {
+        try (FileWriter fileWriter = new FileWriter(CAMINHO_ARQUIVO, true)) {
+            StringBuilder linha = new StringBuilder();
 
-        if (!arquivo.exists()) { criarArquivoCSV(); }
+            for (String value : usuario.values()) {
+                linha.append(value).append(";");
+            }
 
+            linha.append('\n');
+
+            fileWriter.append(linha.toString());
+
+        } catch (IOException e) {
+            logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
+        }
     }
 
-    public static void lerArquivoCSV() {
-        Scanner lerArquivo;
-        File arquivo = new File(CAMINHO_ARQUIVO);
+    public static ArrayList<LinkedHashMap<String, String>> lerArquivoCSV() {
+        var usuarios = new ArrayList<LinkedHashMap<String, String>>();
 
-        if (!arquivo.exists()) { criarArquivoCSV(); }
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(CAMINHO_ARQUIVO))) {
+            String[] camposCSV = bufferedReader.readLine().split(";");
+            String linhaRegistro;
+            while ((linhaRegistro = bufferedReader.readLine()) != null) {
+                LinkedHashMap<String, String> usuario = new LinkedHashMap<>();
 
-        try {
-            lerArquivo = new Scanner(arquivo);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return;
+                String[] infoUsuario = linhaRegistro.split(";");
+
+                for (int i = 0; i < infoUsuario.length; i++) {
+                    usuario.put(camposCSV[i], infoUsuario[i]);
+                }
+
+                usuarios.add(usuario);
+            }
+
+        } catch (IOException e ) {
+            logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
         }
 
-        lerArquivo.useDelimiter(";");
-
-        while (lerArquivo.hasNext()) {
-            System.out.println(lerArquivo.next());
-        }
+        return usuarios;
     }
 }
