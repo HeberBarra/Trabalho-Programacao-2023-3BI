@@ -10,6 +10,18 @@ public class CriarUsuario {
 
     private static final String VALOR_REFAZER = "refazer", CANCELAR_OPERACAO = "cancelar";
 
+    private static boolean verficarNomesDeUsuarios(String nomeDeUsuario) {
+        var usuarios = Arquivo.lerArquivoCSV();
+
+        if (usuarios.size() == 1) { return false; }
+
+        for (LinkedHashMap<String, String> usuario: usuarios) {
+            if (usuario.get("nome").equals(nomeDeUsuario)) { return true; }
+        }
+
+        return false;
+    }
+
     private static String criarNomeDeUsuario() {
         String nome;
 
@@ -25,6 +37,11 @@ public class CriarUsuario {
             if (UtilsComunsInput.verificarValorString(nome, "Nome de usuário")) continue;
             nome = UtilsComunsInput.confirmarEscolha(nome, "Nome de usuário", "Nome de Usuário");
             if (nome.equals(VALOR_REFAZER)) continue;
+
+            if (verficarNomesDeUsuarios(nome)) {
+                JOptionPane.showMessageDialog(null, "Nome de usuário já existe! Por favor tente novamente.");
+                continue;
+            }
 
             return nome;
         }
@@ -97,7 +114,7 @@ public class CriarUsuario {
         this.usuario.put("senha", resultadoHash[0]);
         this.usuario.put("salt", resultadoHash[1]);
         this.usuario.put("highscore", "0");
-        this.usuario.put("modo de jogo (hscore)", null);
+        this.usuario.put("modo de jogo (hscore)", "");
         this.usuario.put("quantidade de jogos", "0");
     }
 
