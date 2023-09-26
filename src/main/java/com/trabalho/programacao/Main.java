@@ -3,11 +3,15 @@ package com.trabalho.programacao;
 public class Main {
 
     public static void main(String[] args) {
-        CriarUsuario novo = new CriarUsuario();
 
-        for (String key: novo.usuario.keySet()) {
-            System.out.println(key + ": " + novo.usuario.get(key));
+        Arquivo.criarArquivoCSV();
+        Usuario usuario = null;
+        var usuariosRegistrados = Arquivo.lerArquivoCSV();
+
+        if (usuariosRegistrados.isEmpty()) {
+            LoginHandler.primeiroCadastro();
         }
-    }
 
+        usuariosRegistrados = Arquivo.lerArquivoCSV();
+    }
 }
