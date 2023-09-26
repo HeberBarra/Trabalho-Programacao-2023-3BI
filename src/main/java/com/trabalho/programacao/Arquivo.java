@@ -10,15 +10,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Arquivo {
-    private static final String CAMINHO_ARQUIVO = "src/main/resources/users.csv";
+
+    private static final String CAMINHO_RESOURCES = "src/main/resources/";
+    private static final String CAMINHO_ARQUIVO = CAMINHO_RESOURCES + "users.csv";
     private static final File arquivoCSV = new File(CAMINHO_ARQUIVO);
     private static final Logger logger = Logger.getLogger(Arquivo.class.getName());
 
     protected static void criarArquivoCSV() {
         if (arquivoCSV.exists()) return;
 
+        File pastaResources = new File(CAMINHO_RESOURCES);
+
+        logger.log(Level.INFO, "Pasta resources criada: " + pastaResources.mkdir());
+
         try (FileWriter fileWriter = new FileWriter(CAMINHO_ARQUIVO, false)) {
-            System.out.println((arquivoCSV.createNewFile()));
+            logger.log(Level.INFO, "Arquivo users.csv criado: " + !arquivoCSV.createNewFile());
             fileWriter.write("nome;senha;salt;highscore;modo de jogo (hscore);quantidade de jogos;\n");
         } catch (IOException e) {
             logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
@@ -60,7 +66,7 @@ public class Arquivo {
                 usuarios.add(usuario);
             }
 
-        } catch (IOException e ) {
+        } catch (IOException e) {
             logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
         }
 
