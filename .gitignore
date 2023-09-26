@@ -38,3 +38,4 @@ build/
 
 ### General ###
 *.class
+src/main/resources/users.csv
