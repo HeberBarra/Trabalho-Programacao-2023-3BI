@@ -13,7 +13,7 @@ public class CriarUsuario {
     private static boolean verficarNomesDeUsuarios(String nomeDeUsuario) {
         var usuarios = Arquivo.lerArquivoCSV();
 
-        if (usuarios.size() == 1) { return false; }
+        if (usuarios.isEmpty()) { return false; }
 
         for (LinkedHashMap<String, String> usuario: usuarios) {
             if (usuario.get("nome").equals(nomeDeUsuario)) { return true; }
