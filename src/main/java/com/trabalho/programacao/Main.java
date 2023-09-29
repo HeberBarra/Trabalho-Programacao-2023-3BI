@@ -76,7 +76,26 @@ public class Main {
                 "\nModo: " + usuarioAtual.getModoDeJogo() +
                 "\nQuantidade de jogos: " + usuarioAtual.getQuantidadeDeJogos()
         );
-        // TODO: Explicar contas
+        JOptionPane.showMessageDialog(null, """
+                Dificuldades disponíveis:
+                *As operações disponíveis num modo estão presentes nos posteriores.
+                Super Fácil: adição;
+                Fácil: subtração;
+                Médio Fácil: levemente mais difícil que o anterior;
+                Médio: Multiplicação;
+                Médio Difícil: divisão, fatorial e potência;
+                Difícil: raiz quadrada."""
+        );
+        JOptionPane.showMessageDialog(null, """
+                Explicações básicas contas:
+                Adição: combinação dos valores de números
+                Subtração: diferença dos valores de números
+                Multiplicação: adição multiplas, basicamente a combinação dos valores de grupos de números. 5 * 4 = cinco grupos de 4 ou quatro grupos de 5, e o total do valor dos grupos é 20
+                Divisão: divisão de um valor em grupos de x elementos, ou seja, 20 / 5 = 4, em outras palavras, 20 dividido em 5 grupos de 4
+                Potência: Multiplicação múltipla de um mesmo valor, a quantidade multiplicações é definida pelo expoente.
+                Raiz quadrada: O oposto da potência. Em outras palavras x é um número que precisa elevado a y, neste caso 2, vezes para encontrar o valor da raiz.
+                Fatorial: Multiplicação múltipla onde o próximo valor é reduzido por 1 até chegar em 1, é indicado por um ! ao lado do número, exemplo: 4! = 4 * 3 * 2 * 1 = 24."""
+        );
     }
 
     private static void jogar() {
