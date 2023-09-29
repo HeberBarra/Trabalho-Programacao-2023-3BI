@@ -2,6 +2,7 @@ package com.trabalho.programacao;
 
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class Usuario {
@@ -56,8 +57,17 @@ public class Usuario {
         return this.infoUsuario.getOrDefault("modo de jogo (hscore)", "");
     }
 
-    public void setModoDeJogo(String modoDeJogo) {
-        this.infoUsuario.replace("modo de jogo(hscore)", modoDeJogo);
+    public void setModoDeJogo(ModosDeJogo modoDeJogo) {
+        HashMap<ModosDeJogo, String> modosDeJogoStringMap = new HashMap<>();
+
+        modosDeJogoStringMap.put(ModosDeJogo.SUPER_FACIL, "Super Fácil");
+        modosDeJogoStringMap.put(ModosDeJogo.FACIL, "Fácil");
+        modosDeJogoStringMap.put(ModosDeJogo.MEDIO_FACIL, "Médio Fácil");
+        modosDeJogoStringMap.put(ModosDeJogo.MEDIO, "Médio");
+        modosDeJogoStringMap.put(ModosDeJogo.MEDIO_DIFICIL, "Médio Difícil");
+        modosDeJogoStringMap.put(ModosDeJogo.DIFICIL, "Difícil");
+
+        this.infoUsuario.replace("modo de jogo (hscore)", modosDeJogoStringMap.get(modoDeJogo));
     }
 
     public int getQuantidadeDeJogos() {
@@ -65,7 +75,9 @@ public class Usuario {
     }
 
     public void aumentarQuantidadeDeJogos() {
-        this.infoUsuario.replace("quantidade jogos", String.valueOf(getQuantidadeDeJogos() + 1));
+        var quantidadeAnterior = getQuantidadeDeJogos();
+        var novaQuantidade = quantidadeAnterior + 1;
+        this.infoUsuario.replace("quantidade de jogos", String.valueOf(novaQuantidade));
     }
 
     public static boolean compararSenha(String hashSenha, String senha, byte[] salt) {

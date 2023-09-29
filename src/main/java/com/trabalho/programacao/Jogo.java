@@ -6,8 +6,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.*;
+import java.text.DecimalFormat;
+import java.util.TimerTask;
 import java.util.Timer;
+import java.util.Random;
+import java.util.ArrayList;
 
 public class Jogo {
 
@@ -16,8 +19,6 @@ public class Jogo {
     private double pontuacaoTotal = 0;
     private JFrame desafio;
     private JLabel labelTempo;
-    private boolean fimDeJogo;
-    private Timer timer;
     private final Random random = new Random();
 
     public Jogo(ModosDeJogo modo, String nomeDoUsuario) {
@@ -56,14 +57,23 @@ public class Jogo {
         final int WIDTH_DESAFIO = 1200;
         final int ESPACAMENTO_BOTOES = 10;
 
-
-        desafio = new JFrame();
+        var contaEResultado = criarContaMatematica(criarValoresConta(operacao), operacao);
         Random random = new Random();
+        desafio = new JFrame();
         JButton[] botoes = new JButton[4];
         final int BOTAO_CERTO = random.nextInt(botoes.length);
-        System.out.println(BOTAO_CERTO);
+
         labelTempo = new JLabel(String.valueOf(tempo[0]));
-//        timer = new Timer();
+
+        JLabel labelConta = new JLabel(contaEResultado[0] + "\t");
+        labelConta.setHorizontalAlignment(SwingConstants.CENTER);
+        labelConta.setVerticalAlignment(SwingConstants.CENTER);
+        labelConta.setSize(500, 500);
+        labelConta.setFont(new Font("Arial", Font.PLAIN, 50));
+        labelConta.setForeground(Color.BLACK);
+        desafio.add(labelConta);
+
+        Timer timer = new Timer();
 
         Container containerBotoes = new Container();
         containerBotoes.setSize(WIDTH_DESAFIO, HEIGHT_DESAFIO / 5 + 10);
@@ -75,7 +85,7 @@ public class Jogo {
             botoes[i].setVerticalAlignment(SwingConstants.CENTER);
             botoes[i].setBackground(Color.GRAY);
             botoes[i].setForeground(Color.WHITE);
-            botoes[i].setText("Teste " + i);
+            botoes[i].setText(criarRespostasErradas(contaEResultado[1]));
             containerBotoes.add(botoes[i]);
             botoes[i].setLocation(posicaoXAnterior, containerBotoes.getHeight() / 2);
             posicaoXAnterior += ESPACAMENTO_BOTOES + botoes[i].getWidth();
@@ -85,6 +95,7 @@ public class Jogo {
                 continue;
             }
 
+            botoes[i].setText(contaEResultado[1]);
             botoes[i].addActionListener(e -> opcaoCerta());
         }
 
@@ -99,6 +110,7 @@ public class Jogo {
 
         int novoX = (WIDTH_DESAFIO - (botoes.length * botoes[0].getWidth() + ESPACAMENTO_BOTOES * (botoes.length))) / 2;
         containerBotoes.setLocation(novoX, HEIGHT_DESAFIO - containerBotoes.getHeight() - botoes[0].getHeight());
+        labelConta.setLocation((desafio.getWidth() - labelConta.getWidth()) / 2, (desafio.getHeight() - labelConta.getHeight()) / 2);
         desafio.add(containerBotoes);
         desafio.setSize(WIDTH_DESAFIO, HEIGHT_DESAFIO);
         desafio.add(labelTempo);
@@ -106,22 +118,24 @@ public class Jogo {
         desafio.setLocationRelativeTo(null);
         desafio.setVisible(true);
 
+        labelTempo.setFont(new Font("Arial", Font.BOLD, 15));
+
         desafio.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 int novoX = (desafio.getWidth() - (botoes.length * botoes[0].getWidth() + ESPACAMENTO_BOTOES * (botoes.length))) / 2;
                 containerBotoes.setLocation(novoX, HEIGHT_DESAFIO - containerBotoes.getHeight() - botoes[0].getHeight());
+                labelConta.setLocation((desafio.getWidth() - labelConta.getWidth()) / 2, (desafio.getHeight() - labelConta.getHeight()) / 2);
             }
         });
 
         desafio.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                fimDeJogo = true;
-                //timer.cancel();
+                timer.cancel();
             }
         });
-/*
+
         int DELAY = 1000;
         int PERIOD = 1000;
         timer.scheduleAtFixedRate(
@@ -130,7 +144,6 @@ public class Jogo {
                     public void run() {
                         if (tempo[0] == -1) {
                             desafio.dispose();
-                            fimDeJogo = true;
                             timer.cancel();
                         }
 
@@ -142,21 +155,18 @@ public class Jogo {
                 DELAY,
                 PERIOD
         );
-        */
 
     }
 
     private void opcaoErrada() {
         desafio.dispose();
+        salvarResultadoJogo();
         JOptionPane.showMessageDialog(null, "Você errou! Fim de jogo.");
     }
 
     private void opcaoCerta() {
-        // TODO: consertar o timer
-        //timer.cancel();
-        //timer.purge();
-        //timer = new Timer();
         desafio.dispose();
+        setPontuacaoTotal(calculoPontuacao(Double.parseDouble(labelTempo.getText())));
         var proximaOperacao = escolherOperacao();
         proximoDesafio(proximaOperacao, new double[]{calculoTempoMaximo(proximaOperacao)});
     }
@@ -166,75 +176,139 @@ public class Jogo {
         return operacoesPossiveis.get(random.nextInt(operacoesPossiveis.size()));
     }
 
-    private String criarContaMatematica(ValorOperacoes operacao) {
-        int quantidadeMaximaValores = 0, quantidadeMinimaValores = 0, valorMaximo = 0;
+    private ArrayList<String> criarValoresConta(ValorOperacoes operacao) {
+        int valorMaximo = 0, valorMinimo = 0;
+        int quantidadeValores = 1;
         boolean apenasInts = true;
-        ArrayList<Double> valores = new ArrayList<>();
+        ArrayList<String> valores = new ArrayList<>();
 
         switch (operacao) {
-            case ADICAO -> {
-                quantidadeMinimaValores = 2;
-                quantidadeMaximaValores = 5;
+            case ADICAO, SUBTRACAO -> {
+                quantidadeValores = 2;
                 valorMaximo = 100;
                 apenasInts = false;
             }
 
-            case SUBTRACAO -> {
-                quantidadeMinimaValores = 2;
-                quantidadeMaximaValores = 3;
-                valorMaximo = 80;
-                apenasInts = false;
-            }
-
             case MULTIPLICAO -> {
-                quantidadeMinimaValores = 2;
-                quantidadeMaximaValores = 3;
-                valorMaximo = 90;
+                quantidadeValores = 2;
+                valorMaximo = 40;
+                valorMinimo = -20;
             }
 
-            case FATORIAL -> {
-                quantidadeMinimaValores = 1;
-                quantidadeMaximaValores = 1;
-                valorMaximo = 10;
-            }
+            case FATORIAL -> valorMaximo = 10;
 
             case POTENCIA -> {
-                quantidadeMinimaValores = 1;
-                quantidadeMaximaValores = 1;
                 valorMaximo = 50;
+                valorMinimo = -50;
             }
 
             case DIVISAO -> {
-                quantidadeMinimaValores = 2;
-                quantidadeMaximaValores = 2;
+                quantidadeValores = 2;
+                valorMaximo = 12;
+                valorMinimo = -5;
             }
 
-            case RAIZ_QUADRADA -> {
-                quantidadeMinimaValores = 1;
-                quantidadeMaximaValores = 1;
-                valorMaximo = 400;
-            }
+            case RAIZ_QUADRADA -> valorMaximo = 50;
         }
 
-        var quantidadeValores = random.nextInt(quantidadeMaximaValores - quantidadeMinimaValores) + quantidadeMinimaValores;
-
+        DecimalFormat formatoNumeros = new DecimalFormat("#.00");
         for (int i = 0; i < quantidadeValores; i++) {
             if (apenasInts) {
-                valores.add((double) random.nextInt(valorMaximo)+1);
+                valores.add(String.valueOf(random.nextInt(valorMaximo) + valorMinimo));
                 continue;
             }
 
-            valores.add(random.nextDouble(valorMaximo) + 1);
+            valores.add(formatoNumeros.format(random.nextDouble(valorMaximo) + 1));
         }
 
-        return "";
+        return valores;
+    }
+
+    private String[] criarContaMatematica(ArrayList<String> valores, ValorOperacoes operacao) {
+        String[] contaEResultado = new String[2];
+        double resultado = 0;
+        DecimalFormat formatoNumeros = new DecimalFormat("0.00");
+
+        if (valores.size() == 1) {
+            String valor = valores.get(0);
+            String conta = "";
+
+            switch (operacao) {
+                case FATORIAL -> {
+                    int valorNumerico = Integer.parseInt(valor);
+                    int total = 1;
+
+                    for (int i = valorNumerico; i > 0; i--) {
+                        total *= i;
+                    }
+
+                    resultado = total;
+                    conta = valor + "!";
+                }
+
+                case POTENCIA -> {
+                    resultado = Math.pow(Double.parseDouble(valores.get(0)), 2);
+                    conta = valor + "^2";
+                }
+
+                case RAIZ_QUADRADA -> {
+                    resultado = Math.sqrt(Double.parseDouble(valor));
+                    conta = valor + "^½";
+                }
+            }
+
+            contaEResultado[0] = conta;
+            contaEResultado[1] = formatoNumeros.format(resultado);
+            return contaEResultado;
+        }
+
+        String conta;
+
+        switch (operacao) {
+            case DIVISAO -> {
+                conta = valores.get(0) + "/" + valores.get(1);
+                resultado = Double.parseDouble(valores.get(0)) / Double.parseDouble(valores.get(1));
+            }
+
+            case MULTIPLICAO -> {
+                conta = valores.get(0) + "*" + valores.get(1);
+                resultado = Double.parseDouble(valores.get(0)) * Double.parseDouble(valores.get(1));
+            }
+            case SUBTRACAO -> {
+                conta = valores.get(0) + " - " + valores.get(1);
+                resultado = Double.parseDouble(valores.get(0)) - Double.parseDouble(valores.get(1));
+            }
+
+            default -> {
+                conta = valores.get(0) + " + " + valores.get(1);
+                resultado = Double.parseDouble(valores.get(0)) + Double.parseDouble(valores.get(1));
+            }
+        }
+        contaEResultado[0] = conta;
+        contaEResultado[1] = formatoNumeros.format(resultado);
+
+        return contaEResultado;
+
+    }
+
+    private String criarRespostasErradas(String respostaCerta) {
+        int numeroAleatorio = random.nextInt(20);
+        int negativo = random.nextBoolean() ? -1 : 1;
+        DecimalFormat formatoNumero = new DecimalFormat("#.00");
+
+        return formatoNumero.format(((Double.parseDouble(respostaCerta) * negativo)) - numeroAleatorio + 1);
     }
 
     private void salvarResultadoJogo() {
-        var usuario = new Usuario (Usuario.getInfoUsuarioPeloNome(nomeDoUsuario));
-        usuario.setHighScore(pontuacaoTotal);
-        usuario.setModoDeJogo(modo.toString());
+        var usuario = new Usuario(Usuario.getInfoUsuarioPeloNome(nomeDoUsuario));
+
+        if (usuario.getHighScore() < getPontuacaoTotal()) {
+            usuario.setHighScore(getPontuacaoTotal());
+            usuario.setModoDeJogo(modo);
+        }
+
         usuario.aumentarQuantidadeDeJogos();
+        Arquivo.atualizarArquivo(usuario.infoUsuario);
     }
 
     private double calculoTempoMaximo(ValorOperacoes valorOperacao) {
@@ -249,7 +323,7 @@ public class Jogo {
         return pontuacaoTotal;
     }
 
-    private void setPontuacaoTotal(int pontos) {
+    private void setPontuacaoTotal(double pontos) {
         pontuacaoTotal += pontos;
     }
 

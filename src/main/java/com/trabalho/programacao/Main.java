@@ -17,8 +17,18 @@ public class Main {
             break;
         }
 
-        Usuario.setUsuarioAtual("Heber");
+        ModosDeJogo[] opcoes = {
+                ModosDeJogo.SUPER_FACIL,
+                ModosDeJogo.FACIL,
+                ModosDeJogo.MEDIO_FACIL,
+                ModosDeJogo.MEDIO,
+                ModosDeJogo.MEDIO_DIFICIL,
+                ModosDeJogo.DIFICIL
+        };
+
+        ModosDeJogo modoEscolhido = (ModosDeJogo) JOptionPane.showInputDialog(null, "Qual a dificuldade desejada? ", "Dificuldade", JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
+
         Usuario usuarioAtual = new Usuario(Usuario.getInfoUsuarioPeloNome(Usuario.getUsuarioAtual()));
-        Jogo jogo = new Jogo(ModosDeJogo.DIFICIL, usuarioAtual.getNome());
+        Jogo jogo = new Jogo(modoEscolhido, usuarioAtual.getNome());
     }
 }

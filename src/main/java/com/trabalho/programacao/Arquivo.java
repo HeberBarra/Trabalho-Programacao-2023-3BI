@@ -49,14 +49,21 @@ public class Arquivo {
         }
     }
 
-    public static void sobreescreverArquivo(ArrayList<LinkedHashMap<String, String>> infoUsuarios) {
-        if (infoUsuarios.isEmpty()) return;
-        var camposCSV = infoUsuarios.get(0).keySet();
+    public static void atualizarArquivo(LinkedHashMap<String, String> infoUsuario) {
+        if (infoUsuario.isEmpty()) return;
+
+        var usuarios = lerArquivoCSV();
+
+        for (int i = 0; i < usuarios.size(); i++) {
+            if (usuarios.get(i).get("nome").equals(infoUsuario.get("nome"))) {
+                usuarios.set(i, infoUsuario);
+            }
+        }
 
         try(FileWriter fileWriter = new FileWriter(arquivoCSV, false)) {
             fileWriter.write(CAMPOS_CSV);
 
-            for (LinkedHashMap<String, String> usuario: infoUsuarios) {
+            for (LinkedHashMap<String, String> usuario: usuarios) {
                 String line = String.join(";", usuario.values()) + "\n";
                 fileWriter.write(line);
             }
