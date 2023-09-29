@@ -64,7 +64,7 @@ public class UtilsComunsInput {
 
         nomeValor = nomeValor.strip().toLowerCase();
         String nomeValorPrimeiraMaiscula = nomeValor.substring(0, 1).toUpperCase() + nomeValor.substring(1);
-        String nomeValorPrimeirasMaisculas = String.join("", Arrays.stream(nomeValor.split(" ")).map(String::toUpperCase).toList());
+        String nomeValorPrimeirasMaisculas = String.join(" ", Arrays.stream(nomeValor.split(" ")).map(String::toUpperCase).toList());
 
         while (true) {
             try {
@@ -92,17 +92,18 @@ public class UtilsComunsInput {
                     valor = String.valueOf(fieldValor.getPassword());
                 }
             } catch (NullPointerException e) {
+                if (deveCancelarOperacao()) {
+                    return CANCELAR_OPERACAO;
+                }
+                continue;
+            }
+
+            if (valor == null) {
                 if (deveCancelarOperacao()) return CANCELAR_OPERACAO;
                 continue;
             }
 
-
-
             if (UtilsComunsInput.verificarValorString(valor, nomeValorPrimeiraMaiscula)) continue;
-
-            if (valor == null) {
-                if (deveCancelarOperacao()) return CANCELAR_OPERACAO;
-            }
 
             if (!mostrarValor) { return valor; }
 
@@ -112,7 +113,7 @@ public class UtilsComunsInput {
                 case VALOR_REFAZER -> { }
 
                 case CANCELAR_OPERACAO -> {
-                    if (deveCancelarOperacao()) return "";
+                    return CANCELAR_OPERACAO;
                 }
 
                 default -> {

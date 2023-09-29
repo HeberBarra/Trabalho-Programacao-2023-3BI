@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 
 public class Usuario {
 
-    private static String usuarioAtual;
+    private static String usuarioAtual = "";
     protected LinkedHashMap<String, String> infoUsuario;
 
     public Usuario(LinkedHashMap<String, String> info) {
@@ -53,10 +53,6 @@ public class Usuario {
         this.infoUsuario.replace("highscore", String.valueOf(novoHighScore));
     }
 
-    public String getModoDeJogo() {
-        return this.infoUsuario.getOrDefault("modo de jogo (hscore)", "");
-    }
-
     public void setModoDeJogo(ModosDeJogo modoDeJogo) {
         HashMap<ModosDeJogo, String> modosDeJogoStringMap = new HashMap<>();
 
@@ -78,10 +74,6 @@ public class Usuario {
         var quantidadeAnterior = getQuantidadeDeJogos();
         var novaQuantidade = quantidadeAnterior + 1;
         this.infoUsuario.replace("quantidade de jogos", String.valueOf(novaQuantidade));
-    }
-
-    public static boolean compararSenha(String hashSenha, String senha, byte[] salt) {
-        return hashSenha.equals(DataHash.dataHasher(senha, salt));
     }
 
     public static LinkedHashMap<String, String> getInfoUsuarioPeloNome(String nome) {
