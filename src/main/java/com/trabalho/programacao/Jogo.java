@@ -269,6 +269,8 @@ public class Jogo {
         }
 
         String conta;
+        valores.set(0, valores.get(0).replace(',', '.'));
+        valores.set(1, valores.get(0).replace(',', '.'));
 
         switch (operacao) {
             case DIVISAO -> {
@@ -301,6 +303,7 @@ public class Jogo {
         int numeroAleatorio = random.nextInt(20);
         int negativo = random.nextBoolean() ? -1 : 1;
         DecimalFormat formatoNumero = new DecimalFormat("#.00");
+        respostaCerta = respostaCerta.replace(',', '.');
 
         return formatoNumero.format(((Double.parseDouble(respostaCerta) * negativo)) - numeroAleatorio + 1);
     }

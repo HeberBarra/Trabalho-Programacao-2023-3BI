@@ -109,7 +109,7 @@ public class Usuario {
 
             escolha = JOptionPane.showConfirmDialog(null, "Senha incorreta! Deseja tentar novamente? ", "Tentar Novamente?", JOptionPane.YES_NO_OPTION);
 
-            if (escolha == 1) { continue; }
+            if (escolha == 0) { continue; }
             return;
         }
     }
