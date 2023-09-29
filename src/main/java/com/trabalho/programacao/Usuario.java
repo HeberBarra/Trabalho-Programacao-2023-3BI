@@ -45,6 +45,10 @@ public class Usuario {
         return salt;
     }
 
+    public String getModoDeJogo() {
+        return this.infoUsuario.getOrDefault("modo de jogo (hscore)", "");
+    }
+
     public double getHighScore() {
         return Double.parseDouble(this.infoUsuario.getOrDefault("highscore", "0"));
     }
@@ -86,23 +90,27 @@ public class Usuario {
         return new LinkedHashMap<>();
     }
 
-    public static boolean apagarUsuario(Usuario usuario) {
+    public static void apagarUsuario(Usuario usuario) {
         while (true) {
             int escolha = JOptionPane.showConfirmDialog(null, "Apagar usuário: " + usuario.getNome(), "Apagar?", JOptionPane.YES_NO_OPTION);
 
-            if (escolha == -1 || escolha == 1) return false;
+            if (escolha == -1 || escolha == 1) return;
 
             String senha = UtilsComunsInput.pegarInputUsuario("Senha", false);
 
             if (usuario.getHashSenha().equals(DataHash.dataHasher(senha, usuario.getSalt()))) {
                 JOptionPane.showMessageDialog(null, "Usuário será apagado");
-                return true;
+                var usuarios = Arquivo.lerArquivoCSV();
+                usuarios.remove(usuario.infoUsuario);
+                Arquivo.sobreescreverArquivo(usuarios);
+                JOptionPane.showMessageDialog(null, "Por questões de segurança o programa será encerrado.");
+                System.exit(0);
             }
 
             escolha = JOptionPane.showConfirmDialog(null, "Senha incorreta! Deseja tentar novamente? ", "Tentar Novamente?", JOptionPane.YES_NO_OPTION);
 
             if (escolha == 1) { continue; }
-            return false;
+            return;
         }
     }
 }

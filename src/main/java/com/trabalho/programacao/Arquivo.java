@@ -49,6 +49,20 @@ public class Arquivo {
         }
     }
 
+    public static void sobreescreverArquivo(ArrayList<LinkedHashMap<String, String>> usuarios) {
+        try (FileWriter fileWriter = new FileWriter(arquivoCSV, false)) {
+            fileWriter.write(CAMPOS_CSV);
+
+            for (LinkedHashMap<String, String> usuario: usuarios) {
+                String line = String.join(";", usuario.values()) + "\n";
+                fileWriter.write(line);
+            }
+
+        } catch (IOException e) {
+            logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
+        }
+    }
+
     public static void atualizarArquivo(LinkedHashMap<String, String> infoUsuario) {
         if (infoUsuario.isEmpty()) return;
 
@@ -60,18 +74,7 @@ public class Arquivo {
             }
         }
 
-        try(FileWriter fileWriter = new FileWriter(arquivoCSV, false)) {
-            fileWriter.write(CAMPOS_CSV);
-
-            for (LinkedHashMap<String, String> usuario: usuarios) {
-                String line = String.join(";", usuario.values()) + "\n";
-                fileWriter.write(line);
-            }
-
-        } catch (IOException e) {
-            logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
-        }
-
+        sobreescreverArquivo(usuarios);
     }
 
     public static ArrayList<LinkedHashMap<String, String>> lerArquivoCSV() {
