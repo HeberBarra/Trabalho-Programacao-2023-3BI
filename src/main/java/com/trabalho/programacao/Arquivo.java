@@ -1,7 +1,11 @@
 package com.trabalho.programacao;
 
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,7 +53,7 @@ public class Arquivo {
         }
     }
 
-    public static void sobreescreverArquivo(ArrayList<LinkedHashMap<String, String>> usuarios) {
+    public static void sobrescreverArquivo(ArrayList<LinkedHashMap<String, String>> usuarios) {
         try (FileWriter fileWriter = new FileWriter(arquivoCSV, false)) {
             fileWriter.write(CAMPOS_CSV);
 
@@ -74,7 +78,7 @@ public class Arquivo {
             }
         }
 
-        sobreescreverArquivo(usuarios);
+        sobrescreverArquivo(usuarios);
     }
 
     public static ArrayList<LinkedHashMap<String, String>> lerArquivoCSV() {

@@ -102,7 +102,7 @@ public class Usuario {
                 JOptionPane.showMessageDialog(null, "Usuário será apagado");
                 var usuarios = Arquivo.lerArquivoCSV();
                 usuarios.remove(usuario.infoUsuario);
-                Arquivo.sobreescreverArquivo(usuarios);
+                Arquivo.sobrescreverArquivo(usuarios);
                 JOptionPane.showMessageDialog(null, "Por questões de segurança o programa será encerrado.");
                 System.exit(0);
             }

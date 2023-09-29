@@ -1,6 +1,6 @@
 package com.trabalho.programacao;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 public class Main {
 

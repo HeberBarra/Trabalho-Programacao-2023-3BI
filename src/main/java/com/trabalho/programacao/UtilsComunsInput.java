@@ -1,6 +1,9 @@
 package com.trabalho.programacao;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
 import java.util.ArrayList;
 import java.util.Arrays;
 
