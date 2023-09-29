@@ -1,6 +1,7 @@
 package com.trabalho.programacao;
 
 
+import javax.swing.*;
 import java.util.LinkedHashMap;
 
 public class Usuario {
@@ -43,11 +44,11 @@ public class Usuario {
         return salt;
     }
 
-    public int getHighScore() {
-        return Integer.parseInt(this.infoUsuario.getOrDefault("highscore", "0"));
+    public double getHighScore() {
+        return Double.parseDouble(this.infoUsuario.getOrDefault("highscore", "0"));
     }
 
-    public void setHighScore(Integer novoHighScore) {
+    public void setHighScore(double novoHighScore) {
         this.infoUsuario.replace("highscore", String.valueOf(novoHighScore));
     }
 
@@ -71,4 +72,33 @@ public class Usuario {
         return hashSenha.equals(DataHash.dataHasher(senha, salt));
     }
 
+    public static LinkedHashMap<String, String> getInfoUsuarioPeloNome(String nome) {
+        for (var usuario: Arquivo.lerArquivoCSV()) {
+            if (usuario.get("nome").equals(nome)) {
+                return usuario;
+            }
+        }
+
+        return new LinkedHashMap<>();
+    }
+
+    public static boolean apagarUsuario(Usuario usuario) {
+        while (true) {
+            int escolha = JOptionPane.showConfirmDialog(null, "Apagar usuário: " + usuario.getNome(), "Apagar?", JOptionPane.YES_NO_OPTION);
+
+            if (escolha == -1 || escolha == 1) return false;
+
+            String senha = UtilsComunsInput.pegarInputUsuario("Senha", false);
+
+            if (usuario.getHashSenha().equals(DataHash.dataHasher(senha, usuario.getSalt()))) {
+                JOptionPane.showMessageDialog(null, "Usuário será apagado");
+                return true;
+            }
+
+            escolha = JOptionPane.showConfirmDialog(null, "Senha incorreta! Deseja tentar novamente? ", "Tentar Novamente?", JOptionPane.YES_NO_OPTION);
+
+            if (escolha == 1) { continue; }
+            return false;
+        }
+    }
 }

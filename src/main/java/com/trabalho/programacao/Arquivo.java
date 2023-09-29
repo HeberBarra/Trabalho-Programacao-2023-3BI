@@ -15,6 +15,7 @@ public class Arquivo {
     private static final String CAMINHO_ARQUIVO = CAMINHO_RESOURCES + "users.csv";
     private static final File arquivoCSV = new File(CAMINHO_ARQUIVO);
     private static final Logger logger = Logger.getLogger(Arquivo.class.getName());
+    private static final String CAMPOS_CSV = "nome;senha;salt;highscore;modo de jogo (hscore);quantidade de jogos;\n";
 
     protected static void criarArquivoCSV() {
         if (arquivoCSV.exists()) return;
@@ -25,7 +26,7 @@ public class Arquivo {
 
         try (FileWriter fileWriter = new FileWriter(CAMINHO_ARQUIVO, false)) {
             logger.log(Level.INFO, "Arquivo users.csv criado: " + !arquivoCSV.createNewFile());
-            fileWriter.write("nome;senha;salt;highscore;modo de jogo (hscore);quantidade de jogos;\n");
+            fileWriter.write(CAMPOS_CSV);
         } catch (IOException e) {
             logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
         }
@@ -46,6 +47,24 @@ public class Arquivo {
         } catch (IOException e) {
             logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
         }
+    }
+
+    public static void sobreescreverArquivo(ArrayList<LinkedHashMap<String, String>> infoUsuarios) {
+        if (infoUsuarios.isEmpty()) return;
+        var camposCSV = infoUsuarios.get(0).keySet();
+
+        try(FileWriter fileWriter = new FileWriter(arquivoCSV, false)) {
+            fileWriter.write(CAMPOS_CSV);
+
+            for (LinkedHashMap<String, String> usuario: infoUsuarios) {
+                String line = String.join(";", usuario.values()) + "\n";
+                fileWriter.write(line);
+            }
+
+        } catch (IOException e) {
+            logger.log(Level.WARNING, Arrays.toString(e.getStackTrace()));
+        }
+
     }
 
     public static ArrayList<LinkedHashMap<String, String>> lerArquivoCSV() {
